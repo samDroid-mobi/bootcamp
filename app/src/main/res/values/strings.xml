@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Bootcamp</string>
+    <string name="welcome_message">Welcome to My Awesome App!</string>
+    <string name="enter_your_username">Enter your username</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="login">Login</string>
+    <string name="remember_me">Remember Me</string>
+</resources>

@@ -1,0 +1,22 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Bootcamp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.Bootcamp" parent="Base.Theme.Bootcamp" />
+
+    <style name="BTheme" />
+
+    <style name="BTheme.Welcome">
+        <item name="android:textColor">@color/android_color</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="BTheme.EditText">
+        <item name="android:background">@drawable/background_edittext</item>
+        <item name="android:padding">16dp</item>
+    </style>
+</resources>
