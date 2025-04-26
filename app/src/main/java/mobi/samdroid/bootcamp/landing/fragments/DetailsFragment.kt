@@ -5,11 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.navigation.fragment.findNavController
 import mobi.samdroid.bootcamp.R
 import mobi.samdroid.bootcamp.databinding.FragmentDetailsBinding
 
-class DetailsFragment : Fragment() {
+class DetailsFragment : BaseFragment() {
 
     private lateinit var _binding: FragmentDetailsBinding
 

@@ -1,17 +1,20 @@
-package mobi.samdroid.bootcamp
+package mobi.samdroid.bootcamp.signup
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
+import mobi.samdroid.bootcamp.R
 import mobi.samdroid.bootcamp.databinding.ActivitySignUpBinding
 import mobi.samdroid.bootcamp.landing.MainActivity
 
 class SignUpActivity : AppCompatActivity() {
     private lateinit var _binding: ActivitySignUpBinding
+    private val _viewModel: SignUpViewModel by viewModels()
 
     private val _mainLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -58,7 +61,7 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         _binding.buttonLogin.setOnClickListener {
-            if (validateUsername()) {
+            if (_viewModel.validateUsername(getUsername())) {
                 val intent = Intent(this, MainActivity::class.java)
                 intent.putExtra(MainActivity.EXTRA_USERNAME, getUsername())
                 intent.putExtra(MainActivity.EXTRA_PASSWORD, getPassword())
@@ -73,12 +76,7 @@ class SignUpActivity : AppCompatActivity() {
         val username = getUsername()
         val password = getPassword()
 
-        _binding.buttonLogin.isEnabled = username.isNotEmpty() && password.isNotEmpty()
-    }
-
-    private fun validateUsername(): Boolean {
-        val username = getUsername()
-        return username.contains(".")
+        _binding.buttonLogin.isEnabled = _viewModel.areCredentialsAvailable(username, password)
     }
 
     private fun getUsername() = _binding.editTextUsername.text.toString()

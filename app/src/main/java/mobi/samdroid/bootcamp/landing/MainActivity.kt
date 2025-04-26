@@ -56,8 +56,4 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
     }
-
-    override fun onBackPressed() {
-        findNavController(R.id.fragment_nav_host).popBackStack()
-    }
 }
