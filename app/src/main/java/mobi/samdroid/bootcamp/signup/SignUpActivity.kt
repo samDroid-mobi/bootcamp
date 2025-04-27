@@ -2,6 +2,7 @@ package mobi.samdroid.bootcamp.signup
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,10 +22,10 @@ class SignUpActivity : AppCompatActivity() {
             if (result.resultCode == RESULT_OK) {
                 val intent = result.data
                 val username = intent?.getStringExtra(MainActivity.EXTRA_USERNAME) ?: ""
-                Toast.makeText(this, getString(R.string.sign_up_successful, username), LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.sign_up_successful, username), LENGTH_SHORT)
+                    .show()
             }
         }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +41,9 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun init() {
         setListeners()
+        setObservers()
+
+        _viewModel.getSavedData(this)
     }
 
     private fun setListeners() {
@@ -52,6 +56,8 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         _binding.checkboxRememberMe.setOnCheckedChangeListener { _, isChecked ->
+            _viewModel.setRememberMe(this, isChecked)
+
             if (isChecked) {
                 Toast.makeText(applicationContext, "You will be remembered!", LENGTH_SHORT).show()
             } else {
@@ -62,12 +68,34 @@ class SignUpActivity : AppCompatActivity() {
 
         _binding.buttonLogin.setOnClickListener {
             if (_viewModel.validateUsername(getUsername())) {
-                val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra(MainActivity.EXTRA_USERNAME, getUsername())
-                intent.putExtra(MainActivity.EXTRA_PASSWORD, getPassword())
-                _mainLauncher.launch(intent)
+                handleSaveData()
+                navigateToLandingScreen()
             } else {
                 Toast.makeText(applicationContext, "Invalid username!", LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun setObservers() {
+        _viewModel.liveIsRememberMe().observe(this) {
+            _binding.checkboxRememberMe.isChecked = it
+
+            if(it) {
+                _viewModel.getCredentials(this)
+            }
+        }
+
+        _viewModel.liveUsername().observe(this) {
+            _binding.editTextUsername.setText(it)
+        }
+
+        _viewModel.livePassword().observe(this) {
+            _binding.editTextPassword.setText(it)
+        }
+
+        _viewModel.liveIsLoggedIn().observe(this) { isLoggedIn ->
+            if (isLoggedIn) {
+                navigateToLandingScreen()
             }
         }
     }
@@ -77,6 +105,20 @@ class SignUpActivity : AppCompatActivity() {
         val password = getPassword()
 
         _binding.buttonLogin.isEnabled = _viewModel.areCredentialsAvailable(username, password)
+    }
+
+    private fun navigateToLandingScreen() {
+        _viewModel.setLoggedIn(this)
+
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra(MainActivity.EXTRA_USERNAME, getUsername())
+        intent.putExtra(MainActivity.EXTRA_PASSWORD, getPassword())
+        _mainLauncher.launch(intent)
+    }
+
+    private fun handleSaveData() {
+        _viewModel.saveUsername(this, getUsername())
+        _viewModel.savePassword(this, getPassword())
     }
 
     private fun getUsername() = _binding.editTextUsername.text.toString()
