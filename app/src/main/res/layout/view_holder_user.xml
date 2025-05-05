@@ -26,14 +26,14 @@
             tools:text="Placeholder" />
 
         <TextView
-            android:id="@+id/textView_email"
+            android:id="@+id/textView_password"
             android:layout_width="wrap_content"
             android:textColor="@color/black"
             android:textSize="12sp"
             app:layout_constraintTop_toBottomOf="@id/textView_name"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="8dp"
-            tools:text="+961 000 000"
+            tools:text="random password"
             android:layout_height="wrap_content" />
 
         <ImageButton

@@ -1,15 +1,23 @@
 package mobi.samdroid.bootcamp.landing.viewmodels
 
+import android.content.Context
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import mobi.samdroid.bootcamp.base.SUser
+import mobi.samdroid.bootcamp.landing.repositories.MainRepository
 
 class MainViewModel: ViewModel() {
+    private val _repository = MainRepository()
+
+    private val _liveUsers = MutableLiveData<ArrayList<SUser>>()
     var user: SUser? = null
 
-    fun getUsers(): ArrayList<SUser> {
-        return ArrayList<SUser>().apply {
-            add(SUser("Sam Shouman", "sam@samdroid.mobi", "+961 3 943 517"))
-            add(SUser("Hussein Mbarak", "hussein.mbarak@gmail.com", "+961 70 891 123"))
-        }
+    fun liveUsers() = _liveUsers
+
+    fun getUsers(context: Context) {
+        _repository.getAllUsers(viewModelScope, context, onFinish = { users ->
+            _liveUsers.value = users as ArrayList<SUser>
+        })
     }
 }

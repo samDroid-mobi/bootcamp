@@ -20,7 +20,11 @@ class UsersAdapter(private val users: ArrayList<SUser>): RecyclerView.Adapter<Us
         holder.bind(users[position])
 
         holder.binding.imageButtonPhone.setOnClickListener {
-            inter?.onClick(users[position])
+            inter?.onPhoneClicked(users[position])
+        }
+
+        holder.binding.root.setOnClickListener {
+            inter?.onItemClick(users[position])
         }
     }
 

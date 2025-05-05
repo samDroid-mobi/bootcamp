@@ -6,13 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import mobi.samdroid.bootcamp.R
 import mobi.samdroid.bootcamp.databinding.FragmentDetailsBinding
+import mobi.samdroid.bootcamp.landing.viewmodels.DetailsViewModel
 
 class DetailsFragment : BaseFragment() {
 
     private lateinit var _binding: FragmentDetailsBinding
+    private val _viewModel: DetailsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,12 +29,14 @@ class DetailsFragment : BaseFragment() {
     override fun onStart() {
         super.onStart()
 
-        setListeners()
+        _viewModel.getDescription()
+
+        setObservers()
     }
 
-    private fun setListeners() {
-        _binding.textViewTitle.setOnClickListener {
-            findNavController().popBackStack(R.id.DetailsFragment, true)
+    private fun setObservers() {
+        _viewModel.liveDescription().observe(viewLifecycleOwner) {
+            _binding.textViewDescription.text = it
         }
     }
 }

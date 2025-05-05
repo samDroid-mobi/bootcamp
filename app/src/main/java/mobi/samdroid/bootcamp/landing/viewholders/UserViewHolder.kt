@@ -6,7 +6,7 @@ import mobi.samdroid.bootcamp.databinding.ViewHolderUserBinding
 
 class UserViewHolder(val binding: ViewHolderUserBinding): RecyclerView.ViewHolder(binding.root) {
     fun bind(user: SUser) {
-        binding.textViewName.text = user.name
-        binding.textViewEmail.text = user.email
+        binding.textViewName.text = user.username
+        binding.textViewPassword.text = user.password
     }
 }

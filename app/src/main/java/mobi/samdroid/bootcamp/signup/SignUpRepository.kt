@@ -6,6 +6,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mobi.samdroid.bootcamp.base.DataStoreManager
+import mobi.samdroid.bootcamp.base.SUser
+import mobi.samdroid.bootcamp.base.database.AppDatabase
 
 class SignUpRepository {
 
@@ -99,6 +101,51 @@ class SignUpRepository {
                 password,
                 stringPreferencesKey(DataStoreManager.PREF_KEY_PASSWORD)
             )
+        }
+    }
+
+    fun checkIfUserFound(
+        viewModelScope: CoroutineScope,
+        context: Context,
+        username: String,
+        password: String,
+        onFinish: (user: SUser?) -> Unit
+    ) {
+        viewModelScope.launch {
+            val db = AppDatabase.getDatabase(context)
+            val user = db.userDao().getUserByCredentials(username, password)
+            onFinish(user)
+        }
+    }
+
+    fun registerUser(
+        viewModelScope: CoroutineScope,
+        context: Context,
+        username: String,
+        password: String,
+        onFinish: (isSuccess: Boolean) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val db = AppDatabase.getDatabase(context)
+                db.userDao().insert(SUser(username = username, password = password))
+                onFinish(true)
+            } catch (e: Exception) {
+                onFinish(false)
+            }
+        }
+    }
+
+    fun checkIfUserAlreadyRegistered(
+        viewModelScope: CoroutineScope,
+        context: Context,
+        username: String,
+        onFinish: (user: SUser?) -> Unit
+    ) {
+        viewModelScope.launch {
+            val db = AppDatabase.getDatabase(context)
+            val user = db.userDao().getUserByUsername(username)
+            onFinish(user)
         }
     }
 }

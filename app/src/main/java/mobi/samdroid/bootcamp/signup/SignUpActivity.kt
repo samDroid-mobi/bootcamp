@@ -2,7 +2,6 @@ package mobi.samdroid.bootcamp.signup
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.result.contract.ActivityResultContracts
@@ -10,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import mobi.samdroid.bootcamp.R
+import mobi.samdroid.bootcamp.base.extenions.showToast
 import mobi.samdroid.bootcamp.databinding.ActivitySignUpBinding
 import mobi.samdroid.bootcamp.landing.MainActivity
 
@@ -57,21 +57,21 @@ class SignUpActivity : AppCompatActivity() {
 
         _binding.checkboxRememberMe.setOnCheckedChangeListener { _, isChecked ->
             _viewModel.setRememberMe(this, isChecked)
+        }
 
-            if (isChecked) {
-                Toast.makeText(applicationContext, "You will be remembered!", LENGTH_SHORT).show()
+        _binding.textViewSignup.setOnClickListener {
+            if (_viewModel.validateUsername(getUsername())) {
+                _viewModel.checkIfUserAlreadyRegistered(applicationContext, getUsername())
             } else {
-                Toast.makeText(applicationContext, "You will not be remembered!", LENGTH_SHORT)
-                    .show()
+                showToast(applicationContext, getString(R.string.invalid_username))
             }
         }
 
         _binding.buttonLogin.setOnClickListener {
             if (_viewModel.validateUsername(getUsername())) {
-                handleSaveData()
-                navigateToLandingScreen()
+                _viewModel.checkIfUserFound(applicationContext, getUsername(), getPassword())
             } else {
-                Toast.makeText(applicationContext, "Invalid username!", LENGTH_SHORT).show()
+                showToast(applicationContext, getString(R.string.invalid_username))
             }
         }
     }
@@ -80,7 +80,7 @@ class SignUpActivity : AppCompatActivity() {
         _viewModel.liveIsRememberMe().observe(this) {
             _binding.checkboxRememberMe.isChecked = it
 
-            if(it) {
+            if (it) {
                 _viewModel.getCredentials(this)
             }
         }
@@ -96,6 +96,32 @@ class SignUpActivity : AppCompatActivity() {
         _viewModel.liveIsLoggedIn().observe(this) { isLoggedIn ->
             if (isLoggedIn) {
                 navigateToLandingScreen()
+            }
+        }
+
+        _viewModel.liveUser().observe(this) { user ->
+            if (user != null) {
+                handleSaveData()
+                navigateToLandingScreen()
+            } else {
+                showToast(applicationContext, getString(R.string.user_not_found))
+            }
+        }
+
+        _viewModel.liveIsUserRegistered().observe(this) { isSuccess ->
+            if (isSuccess) {
+                handleSaveData()
+                navigateToLandingScreen()
+            } else {
+                showToast(applicationContext, getString(R.string.something_went_wrong))
+            }
+        }
+
+        _viewModel.liveCheckIfUserRegistered().observe(this) { isUserRegistered ->
+            if (isUserRegistered) {
+                showToast(applicationContext, getString(R.string.user_already_registered))
+            } else {
+                _viewModel.registerUser(applicationContext, getUsername(), getPassword())
             }
         }
     }

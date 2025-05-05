@@ -8,7 +8,10 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.room.util.appendPlaceholders
+import mobi.samdroid.bootcamp.R
 import mobi.samdroid.bootcamp.base.IClickListener
 import mobi.samdroid.bootcamp.base.SUser
 import mobi.samdroid.bootcamp.base.utils.SUtils
@@ -41,9 +44,12 @@ class MainFragment : BaseFragment(), IClickListener {
     override fun onStart() {
         super.onStart()
 
+        _viewModel.getUsers(requireContext())
+
         handleBack()
         setViews()
         setListeners()
+        setObservers()
     }
 
     private fun setViews() {
@@ -53,14 +59,18 @@ class MainFragment : BaseFragment(), IClickListener {
                 LinearLayoutManager.VERTICAL,
                 false
             ) // @reverseLayout: to show the data in a reversed order
-
-        _binding.recyclerViewUsers.adapter = UsersAdapter(_viewModel.getUsers()).apply {
-            inter = this@MainFragment
-        }
     }
 
     private fun setListeners() {
 
+    }
+
+    private fun setObservers() {
+        _viewModel.liveUsers().observe(viewLifecycleOwner) { users ->
+            _binding.recyclerViewUsers.adapter = UsersAdapter(users).apply {
+                inter = this@MainFragment
+            }
+        }
     }
 
     private fun handleBack() {
@@ -70,14 +80,18 @@ class MainFragment : BaseFragment(), IClickListener {
     }
 
 
-    override fun onClick(user: SUser) {
+    override fun onPhoneClicked(user: SUser) {
         _viewModel.user = user
 
         if (SUtils.isPermissionGranted(requireContext(), Manifest.permission.CALL_PHONE)) {
-            SUtils.callPhoneNumber(requireContext(), user.mobileNumber)
+            SUtils.callPhoneNumber(requireContext(), "+961 3 943 517")
         } else {
             mRequestPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
         }
+    }
+
+    override fun onItemClick(user: SUser) {
+        findNavController().navigate(R.id.action_MainFragment_to_DetailsFragment)
     }
 
 }
